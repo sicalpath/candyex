@@ -50,6 +50,7 @@ contract CandyReceipt is Owned {
 
         address asset;      //token to deposit  ELF:0xbf2179859fc6d5bee9bf9158632dc51678a4100e
         address owner;      //owner of this receipt
+        string targetAddress;
         address bonusAsset;
         uint256 amount;
         uint256 interestRate;
@@ -91,6 +92,7 @@ contract CandyReceipt is Owned {
     function _createReceipt(
         address _asset, 
         address _owner, 
+        string _targetAddress,
         address _bonusAsset, 
         uint256 _amount, 
         uint256 _interestRate, 
@@ -99,7 +101,7 @@ contract CandyReceipt is Owned {
         bool _finished
         ) internal {
 
-        uint256 id = receipts.push(Receipt(_asset, _owner, _bonusAsset, _amount, _interestRate, _startTime, _endTime, _finished)) - 1;
+        uint256 id = receipts.push(Receipt(_asset, _owner, _targetAddress, _bonusAsset, _amount, _interestRate, _startTime, _endTime, _finished)) - 1;
         
         receiptCount = id + 1;
         receiptToOwner[id] = msg.sender;
@@ -108,7 +110,7 @@ contract CandyReceipt is Owned {
 
 
     //create new receipt
-    function createReceipt(uint256 _amount) external haveAllowance(asset,_amount) {
+    function createReceipt(uint256 _amount, string targetAddress) external haveAllowance(asset,_amount) {
   
         //other processes
 
@@ -116,7 +118,7 @@ contract CandyReceipt is Owned {
         if (!ERC20(asset).transferFrom(msg.sender, address(this), _amount)) throw;
 
         //
-        _createReceipt(asset, msg.sender, bonusAsset, _amount, interestRate, now, now + saveTime, false );
+        _createReceipt(asset, msg.sender, targetAddress, bonusAsset, _amount, interestRate, now, now + saveTime, false );
     }
 
     //finish the receipt and withdraw bonus and token
