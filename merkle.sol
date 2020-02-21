@@ -49,6 +49,7 @@ contract MerkleTreeGenerator is Owned {
     CandyReceipt candyReceipt = CandyReceipt(0xbf2179859fc6d5bee9bf9158632dc51678a4100e);
     bytes32[] public leafNodes;
     MerkleTree[] public merkleTrees;
+    MerkleNode[] public merkleNodes;
 
     struct MerkleTree {
 
@@ -165,5 +166,53 @@ contract MerkleTreeGenerator is Owned {
        
     }
     
-    
+    //get users merkle tree path
+    function GenerateMerklePath(uint256 index) public returns(MerklePath) {
+        
+        MerkleTree memory merkleTree = merkleTrees[merkleTrees.length - 1]; //先从最新的获取吧
+        
+        assert(index < merkleTree.leaf_count);
+        
+        delete merkleNodes; //clear first
+        
+        //MerklePath path = MerklePath();
+        uint256 indexOfFirstNodeInRow = 0;
+        uint256 nodeCountInRow = merkleTree.leaf_count;
+        bytes32 neighbor;
+        bool isLeftNeighbor;
+        uint256 shift;
+        
+       
+        
+        while (index < merkleTree.nodes.length - 1) {
+            
+            
+            if (index % 2 == 0)
+            {
+                // add right neighbor node
+                neighbor = merkleTree.nodes[index + 1];
+                isLeftNeighbor = false;
+            }
+            else
+            {
+                // add left neighbor node
+                neighbor = merkleTree.nodes[index - 1];
+                isLeftNeighbor = true;
+            }
+            
+            merkleNodes.push(MerkleNode(neighbor, isLeftNeighbor));
+            
+            nodeCountInRow = nodeCountInRow % 2 == 0 ? nodeCountInRow : nodeCountInRow + 1;
+            shift = (index - indexOfFirstNodeInRow) / 2;
+            indexOfFirstNodeInRow += nodeCountInRow;
+            index = indexOfFirstNodeInRow + shift;
+            nodeCountInRow /= 2;
+            
+        }
+        
+        MerklePath memory path = MerklePath(merkleNodes);
+        
+        return path;
+
+    }
 }
