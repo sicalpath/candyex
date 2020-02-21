@@ -1,16 +1,6 @@
 pragma solidity ^0.4.18;
 
 
-contract ERC20 {
-  uint256 public totalSupply;
-  function balanceOf(address who) public view returns (uint256);
-  function transfer(address to, uint256 value) public returns (bool);
-  function allowance(address owner, address spender) public view returns (uint256);
-  function transferFrom(address from, address to, uint256 value) public returns (bool);
-  function approve(address spender, uint256 value) public returns (bool);
-  event Transfer(address indexed from, address indexed to, uint256 value);
-  event Approval(address indexed owner, address indexed spender, uint256 value);
-}
 
 contract Owned {
     address public owner;
@@ -33,6 +23,16 @@ contract Owned {
 
 
 
+contract ERC20 {
+  uint256 public totalSupply;
+  function balanceOf(address who) public view returns (uint256);
+  function transfer(address to, uint256 value) public returns (bool);
+  function allowance(address owner, address spender) public view returns (uint256);
+  function transferFrom(address from, address to, uint256 value) public returns (bool);
+  function approve(address spender, uint256 value) public returns (bool);
+  event Transfer(address indexed from, address indexed to, uint256 value);
+  event Approval(address indexed owner, address indexed spender, uint256 value);
+}
 
 contract CandyReceipt is Owned {
     
@@ -41,9 +41,9 @@ contract CandyReceipt is Owned {
 
     address public asset = 0xbf2179859fc6d5bee9bf9158632dc51678a4100e;
     address public bonusAsset = 0xbf2179859fc6d5bee9bf9158632dc51678a4100e;
-    uint256 public saveTime = 86400; //1 days;
-    uint256 public interestRate = 10; // rate of asset to bonus per day/hour/minute
-
+    uint256 public saveTime = 86400 * 30; //1 days;
+    uint256 public interestRate = 100; // rate of asset to bonus per day/hour/minute
+    uint256 public receiptCount = 0;
 
 
     struct Receipt {
@@ -100,7 +100,8 @@ contract CandyReceipt is Owned {
         ) internal {
 
         uint256 id = receipts.push(Receipt(_asset, _owner, _bonusAsset, _amount, _interestRate, _startTime, _endTime, _finished)) - 1;
-
+        
+        receiptCount = id + 1;
         receiptToOwner[id] = msg.sender;
         NewReceipt(id, _asset, _endTime);
     }
