@@ -47,9 +47,10 @@ contract MerkleTreeGenerator is Owned {
     event NewReceipt(uint256 receiptId, address asset, uint256 endTime);
 
     CandyReceipt candyReceipt = CandyReceipt(0xbf2179859fc6d5bee9bf9158632dc51678a4100e);
-    bytes32[] public leafNodes;
+    bytes32[] public leafNodes;         //always empty
+    MerkleNode[] public merkleNodes;    //always empty
     MerkleTree[] public merkleTrees;
-    MerkleNode[] public merkleNodes;
+    
 
     struct MerkleTree {
 
@@ -118,7 +119,7 @@ contract MerkleTreeGenerator is Owned {
     }
     
     //create new receipt
-    function GenerateMerkle() external {
+    function GenerateMerkleTree() external {
         
         //fetch data and generate leaves
         ReceiptsToLeaves();
@@ -161,8 +162,8 @@ contract MerkleTreeGenerator is Owned {
         //save to merkleTrees
         merkleTrees.push(MerkleTree(leafNodes, leafNodes[leafNodes.length - 1], leafCount, block.number));
         
-        
-        
+        //clean leafNodes
+        delete leafNodes;
        
     }
     
@@ -211,6 +212,8 @@ contract MerkleTreeGenerator is Owned {
         }
         
         MerklePath memory path = MerklePath(merkleNodes);
+        
+        delete merkleNodes; //clear final
         
         return path;
 
