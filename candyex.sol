@@ -39,7 +39,7 @@ contract CandyReceipt is Owned {
     using SafeMath for uint256;
     event NewReceipt(uint256 receiptId, address asset, uint256 endTime);
 
-    address public asset = 0xbf2179859fc6d5bee9bf9158632dc51678a4100e;
+    address public asset = 0x5755f20951ea78C111e359E04032eF38880De0Cd;
     address public bonusAsset = 0xbf2179859fc6d5bee9bf9158632dc51678a4100e;
     uint256 public saveTime = 86400 * 30; //1 days;
     uint256 public interestRate = 100; // rate of asset to bonus per day/hour/minute
@@ -131,7 +131,7 @@ contract CandyReceipt is Owned {
         //保证要有足够的allowance
         uint256 bonusAmount = receipts[_id].amount.mul(receipts[_id].interestRate).div(100);    //percent rate of asset to bonus    1000elf->100 other token
 
-        if (!ERC20(bonusAsset).transfer(receipts[_id].owner, bonusAmount )) throw;
+        //if (!ERC20(bonusAsset).transfer(receipts[_id].owner, bonusAmount )) throw;
 
         if (!ERC20(asset).transfer(receipts[_id].owner, receipts[_id].amount )) throw;
 

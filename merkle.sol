@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 pragma experimental ABIEncoderV2;
 
 contract CandyReceipt {
-    
+
   Receipt[] public receipts;
   uint256 public receiptCount;
   
@@ -44,11 +44,11 @@ contract Owned {
 contract MerkleTreeGenerator is Owned {
     
     //using SafeMath for uint256;
-    event NewReceipt(uint256 receiptId, address asset, uint256 endTime);
+    event Log(bytes data);
 
-    CandyReceipt candyReceipt = CandyReceipt(0xbf2179859fc6d5bee9bf9158632dc51678a4100e);
+    CandyReceipt candyReceipt = CandyReceipt(0xb1DB8f1834ab5034142240f3bF615a3D703cBefa);
     bytes32[] public leafNodes;         //always empty
-    MerkleNode[] public merkleNodes;    //always empty
+    //MerkleNode[] public merkleNodes;    //always empty
     MerkleTree[] public merkleTrees;
     
 
@@ -111,8 +111,10 @@ contract MerkleTreeGenerator is Owned {
             ) = candyReceipt.receipts(i);
             
             
-            if(finished == false)
+            if(finished == false) {
                 leafNodes.push(sha256(abi.encodePacked(targetAddress,amount)));
+                Log(abi.encodePacked(targetAddress,amount));
+            }
             
         }
         
@@ -166,22 +168,37 @@ contract MerkleTreeGenerator is Owned {
         delete leafNodes;
        
     }
-    
+    function GetReceipt(uint256 index) public view returns(bytes) {
+        (
+                address asset,
+                address owner,
+                string memory targetAddress,
+                address bonusAsset,
+                uint256 amount,
+                uint256 interestRate,
+                uint256 startTime,
+                uint256 endTime,
+                bool finished 
+        ) = candyReceipt.receipts(index);
+            
+        return abi.encodePacked(targetAddress,amount);
+    }
     //get users merkle tree path
-    function GenerateMerklePath(uint256 index) public returns(MerklePath) {
+    function GenerateMerklePath(uint256 index) public view returns(bytes32[20],bool[20]) {
         
         MerkleTree memory merkleTree = merkleTrees[merkleTrees.length - 1]; //先从最新的获取吧
         
         assert(index < merkleTree.leaf_count);
+
+        bytes32[20] neighbors;
+        bool[20] isLeftNeighbors;
         
-        delete merkleNodes; //clear first
-        
-        //MerklePath path = MerklePath();
         uint256 indexOfFirstNodeInRow = 0;
         uint256 nodeCountInRow = merkleTree.leaf_count;
         bytes32 neighbor;
         bool isLeftNeighbor;
         uint256 shift;
+        uint256 i = 0;
         
        
         
@@ -201,7 +218,9 @@ contract MerkleTreeGenerator is Owned {
                 isLeftNeighbor = true;
             }
             
-            merkleNodes.push(MerkleNode(neighbor, isLeftNeighbor));
+            neighbors[i] = neighbor;
+            isLeftNeighbors[i++] = isLeftNeighbor;
+            //merkleNodes[i++] = MerkleNode(neighbor, isLeftNeighbor);
             
             nodeCountInRow = nodeCountInRow % 2 == 0 ? nodeCountInRow : nodeCountInRow + 1;
             shift = (index - indexOfFirstNodeInRow) / 2;
@@ -211,11 +230,11 @@ contract MerkleTreeGenerator is Owned {
             
         }
         
-        MerklePath memory path = MerklePath(merkleNodes);
         
-        delete merkleNodes; //clear final
         
-        return path;
+        return (neighbors,isLeftNeighbors);
 
     }
+    
+    
 }
