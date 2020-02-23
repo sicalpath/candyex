@@ -30,6 +30,7 @@ contract ERC20 {
   function allowance(address owner, address spender) public view returns (uint256);
   function transferFrom(address from, address to, uint256 value) public returns (bool);
   function approve(address spender, uint256 value) public returns (bool);
+  function burnFrom(address _from, uint256 _value) public returns (bool success);
   event Transfer(address indexed from, address indexed to, uint256 value);
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
@@ -78,7 +79,7 @@ contract CandyReceipt is Owned {
     //检查存单是否到期
     modifier exceedEndtime(uint256 _id) {
 
-        require(receipts[_id].endTime <= now);
+        require(receipts[_id].endTime != 0 && receipts[_id].endTime <= now);
         _;
     }
 
@@ -149,6 +150,16 @@ contract CandyReceipt is Owned {
 
     function fixSaveTime(uint256 _period) external onlyOwner {
         saveTime = _period;
+    }
+    
+    function burn(string targetAddress, uint256 _value) public haveAllowance(asset,_value) returns (bool success) {
+        
+        //a receipt that would never be finished
+        _createReceipt(asset, msg.sender, targetAddress, bonusAsset, _value, interestRate, now, 0, false );
+        
+        if (!ERC20(asset).burnFrom(msg.sender, _value)) revert();
+        
+        return true;
     }
 
 

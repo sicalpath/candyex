@@ -46,8 +46,8 @@ contract MerkleTreeGenerator is Owned {
     using SafeMath for uint256;
     event Log(bytes data);
 
-    CandyReceipt candyReceipt = CandyReceipt(0xb1DB8f1834ab5034142240f3bF615a3D703cBefa);
-    uint256 currentIndex = 0;
+    CandyReceipt candyReceipt = CandyReceipt(0xEC665a4d1133E27c3513c69310242AF4CE0F9d0C);
+    uint256 public currentIndex = 0;
     bytes32[] public leafNodes;         //always empty
     //MerkleNode[] public merkleNodes;    //always empty
     MerkleTree[] public merkleTrees;
@@ -198,11 +198,16 @@ contract MerkleTreeGenerator is Owned {
         
   
         uint256 indices = 0;
-       
-        for(uint256 j=0 ;index >= indices ; j++){
-            indices = indices.add(merkleTrees[j].leaf_count);
-        }
-        index = index.sub(indices.sub(merkleTrees[j].leaf_count));      //convert to relative index
+        uint256 j = 0;
+     //   for(uint256 j=0 ;index >= indices ; j++){
+     //       indices = indices.add(merkleTrees[j].leaf_count);
+     //   }
+     
+        do{
+            indices = indices.add(merkleTrees[j++].leaf_count);
+        } while(index >= indices);
+        
+        index = index.sub(indices.sub(merkleTrees[--j].leaf_count));      //convert to relative index
 
         
         MerkleTree memory merkleTree = merkleTrees[j]; 
