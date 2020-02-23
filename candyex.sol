@@ -64,6 +64,7 @@ contract CandyReceipt is Owned {
     Receipt[] public receipts;
 
     mapping (uint256 => address) public receiptToOwner;
+    mapping (address => uint256[]) public ownerToReceipts;
 
 
     //检查某token是否授权了足够的额度
@@ -105,6 +106,7 @@ contract CandyReceipt is Owned {
         
         receiptCount = id + 1;
         receiptToOwner[id] = msg.sender;
+        ownerToReceipts[msg.sender].push(id);
         NewReceipt(id, _asset, _endTime);
     }
 
@@ -138,7 +140,12 @@ contract CandyReceipt is Owned {
         //完成
         receipts[_id].finished = true;
     }
-
+    
+    function getMyReceipts() external view returns (uint256[]){
+        
+        return ownerToReceipts[msg.sender];
+        
+    }
 
     function fixSaveTime(uint256 _period) external onlyOwner {
         saveTime = _period;
