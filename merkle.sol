@@ -151,7 +151,7 @@ contract MerkleTreeGenerator is Owned {
             
             left = leafNodes[i++];
             right = leafNodes[i++];
-            leafNodes.push(sha256(left,right));
+            leafNodes.push(sha256(abi.encodePacked(left,right)));
             if (++newAdded != nodeToAdd)
                 continue;
 
@@ -175,7 +175,11 @@ contract MerkleTreeGenerator is Owned {
         delete leafNodes;
        
     }
-    function GetReceipt(uint256 index) public view returns(bytes) {
+    function GetNodes(uint256 index) public view returns(bytes32[]) {
+        
+        return merkleTrees[index].nodes;
+    }
+    function GetReceipt(uint256 index) public view returns(bytes, bytes32) {
         (
                 address asset,
                 address owner,
@@ -188,7 +192,7 @@ contract MerkleTreeGenerator is Owned {
                 bool finished 
         ) = candyReceipt.receipts(index);
             
-        return abi.encodePacked(targetAddress,amount);
+        return (abi.encodePacked(targetAddress,amount),sha256(abi.encodePacked(targetAddress,amount)));
     }
     //get users merkle tree path
     function GenerateMerklePath(uint256 index) public view returns(bytes32[20],bool[20]) {
@@ -214,8 +218,8 @@ contract MerkleTreeGenerator is Owned {
         
         assert(index < merkleTree.leaf_count);
 
-        bytes32[20] neighbors;
-        bool[20] isLeftNeighbors;
+        bytes32[20] memory neighbors;// = new bytes32[](20) ;
+        bool[20] memory isLeftNeighbors;
         uint256 indexOfFirstNodeInRow = 0;
         uint256 nodeCountInRow = merkleTree.leaf_count;
         bytes32 neighbor;
