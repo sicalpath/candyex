@@ -173,7 +173,7 @@ contract MerkleTreeGenerator is Owned {
         }
         
         
-        //save to merkleTrees
+        //save to merkleTrees need to check
         merkleTrees.push(MerkleTree(leafNodes, leafNodes[leafNodes.length - 1], leafCount, block.number));
         
         //clean leafNodes
