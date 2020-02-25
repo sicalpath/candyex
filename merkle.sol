@@ -98,6 +98,9 @@ contract MerkleTreeGenerator is Owned {
         //this leafCount include finished receipts
         uint256 leafCount = receiptCount.sub(currentIndex);
         
+        //no more than 1023 leaves in a tree
+        leafCount = leafCount > 1023 ? 1023 : leafCount;
+        
         assert(leafCount > 0);
         
         //Hash all leaves
@@ -123,7 +126,7 @@ contract MerkleTreeGenerator is Owned {
             
         }
         
-        currentIndex = receiptCount;
+        currentIndex += leafCount;
         
     }
     
