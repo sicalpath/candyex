@@ -120,8 +120,8 @@ contract MerkleTreeGenerator is Owned {
             
             if(finished == false) {
                 //leafNodes.push(sha256(abi.encodePacked(amount, targetAddress)));
-                leafNodes.push(sha256(amount, sha256(targetAddress),currentIndex + i));
-                Log(abi.encodePacked(amount, sha256(targetAddress), currentIndex + i));
+                leafNodes.push(sha256(sha256(amount), sha256(targetAddress),sha256(currentIndex + i)));
+                Log(abi.encodePacked(sha256(amount), sha256(targetAddress), sha256(currentIndex + i)));
             }
             
         }
@@ -191,14 +191,14 @@ contract MerkleTreeGenerator is Owned {
                 string memory targetAddress,
                 address bonusAsset,
                 uint256 amount,
-                uint256 interestRate,
-                uint256 startTime,
-                uint256 endTime,
+                ,
+                ,
+                ,
                 bool finished 
         ) = candyReceipt.receipts(index);
             
         //return (abi.encodePacked(amount, targetAddress),sha256(abi.encodePacked(amount, targetAddress)));
-        return (abi.encodePacked(amount, sha256(targetAddress), index), sha256(amount, sha256(targetAddress), index));
+        return (abi.encodePacked(sha256(amount), sha256(targetAddress), sha256(index)), sha256(sha256(amount), sha256(targetAddress), sha256(index)));
     }
     //get users merkle tree path
     function GenerateMerklePath(uint256 index) public view returns(bytes32[20],bool[20]) {
