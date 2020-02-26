@@ -120,8 +120,8 @@ contract MerkleTreeGenerator is Owned {
             
             if(finished == false) {
                 //leafNodes.push(sha256(abi.encodePacked(amount, targetAddress)));
-                leafNodes.push(sha256(amount, targetAddress));
-                Log(abi.encodePacked(amount, targetAddress));
+                leafNodes.push(sha256(amount, sha256(targetAddress),currentIndex + i));
+                Log(abi.encodePacked(amount, sha256(targetAddress), currentIndex + i));
             }
             
         }
@@ -173,7 +173,7 @@ contract MerkleTreeGenerator is Owned {
         }
         
         
-        //save to merkleTrees need to check
+        //save to merkleTrees
         merkleTrees.push(MerkleTree(leafNodes, leafNodes[leafNodes.length - 1], leafCount, block.number));
         
         //clean leafNodes
@@ -198,7 +198,7 @@ contract MerkleTreeGenerator is Owned {
         ) = candyReceipt.receipts(index);
             
         //return (abi.encodePacked(amount, targetAddress),sha256(abi.encodePacked(amount, targetAddress)));
-        return (abi.encodePacked(amount, targetAddress),sha256(amount, targetAddress));
+        return (abi.encodePacked(amount, sha256(targetAddress), index), sha256(amount, sha256(targetAddress), index));
     }
     //get users merkle tree path
     function GenerateMerklePath(uint256 index) public view returns(bytes32[20],bool[20]) {
