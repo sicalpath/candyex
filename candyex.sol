@@ -40,7 +40,7 @@ contract CandyReceipt is Owned {
     using SafeMath for uint256;
     event NewReceipt(uint256 receiptId, address asset, uint256 endTime);
 
-    address public asset = 0x5755f20951ea78C111e359E04032eF38880De0Cd;
+    address public asset = 0x26eC050Cb578451A338b61F3645BCA2585845ffd;
     address public bonusAsset = 0xbf2179859fc6d5bee9bf9158632dc51678a4100e;
     uint256 public saveTime = 86400 * 30; //1 days;
     uint256 public interestRate = 100; // rate of asset to bonus per day/hour/minute
@@ -152,6 +152,10 @@ contract CandyReceipt is Owned {
         saveTime = _period;
     }
     
+    function fixAssetAddress(address _address) external onlyOwner {
+        asset = _address;
+    }
+    
     function burn(string targetAddress, uint256 _value) public haveAllowance(asset,_value) returns (bool success) {
         
         //a receipt that would never be finished
@@ -160,6 +164,13 @@ contract CandyReceipt is Owned {
         if (!ERC20(asset).burnFrom(msg.sender, _value)) revert();
         
         return true;
+    }
+    
+    
+    function getReceiptInfo(uint256 index) public view returns(bytes32, string, uint256){
+        
+        return (sha256(index), receipts[index].targetAddress, receipts[index].amount);
+        
     }
 
 
