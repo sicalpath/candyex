@@ -46,7 +46,7 @@ contract MerkleTreeGenerator is Owned {
     using SafeMath for uint256;
     event Log(bytes data);
 
-    CandyReceipt candyReceipt = CandyReceipt(0x84Edc981604eb3Ae248bDAB9c54ce9B07272C8e4);
+    CandyReceipt candyReceipt = CandyReceipt(0x45b4f34f439848303CbE73dcb197e8658eeeE7a8);
     uint256 public currentIndex = 0;
     bytes32[] public leafNodes;         //always empty
     MerkleTree[] public merkleTrees;
@@ -202,6 +202,10 @@ contract MerkleTreeGenerator is Owned {
         //return (abi.encodePacked(amount, targetAddress),sha256(abi.encodePacked(amount, targetAddress)));
         return (abi.encodePacked(sha256(amount), sha256(targetAddress), sha256(index)), sha256(sha256(amount), sha256(targetAddress), sha256(index)));
     }
+    function GetMerkleTreeCount() public view returns(uint256) {
+        return merkleTrees.length;
+    }
+    
     //get users merkle tree path
     function GenerateMerklePath(uint256 index) public view returns(bytes32[20],bool[20]) {
         

@@ -26,14 +26,16 @@ contract Owned {
 contract ERC20 {
   uint256 public totalSupply;
   function balanceOf(address who) public view returns (uint256);
-  function transfer(address to, uint256 value) public returns (bool);
+  //function transfer(address to, uint256 value) public returns (bool); //real elf
+  function transfer(address _to, uint256 _value) public;
   function allowance(address owner, address spender) public view returns (uint256);
   function transferFrom(address from, address to, uint256 value) public returns (bool);
   function approve(address spender, uint256 value) public returns (bool);
-  function burnFrom(address _from, uint256 _value) public returns (bool success);
+  function burnTokens(uint256 _amount) public returns (bool);
   event Transfer(address indexed from, address indexed to, uint256 value);
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
+
 
 contract CandyReceipt is Owned {
     
@@ -132,19 +134,21 @@ contract CandyReceipt is Owned {
         //withdraw bonus and token
         //maybe more security check!!!!
         //保证要有足够的allowance
-        uint256 bonusAmount = receipts[_id].amount.mul(receipts[_id].interestRate).div(100);    //percent rate of asset to bonus    1000elf->100 other token
+        //uint256 bonusAmount = receipts[_id].amount.mul(receipts[_id].interestRate).div(100);  //percent rate of asset to bonus    1000elf->100 other token
 
         //if (!ERC20(bonusAsset).transfer(receipts[_id].owner, bonusAmount )) throw;
 
-        if (!ERC20(asset).transfer(receipts[_id].owner, receipts[_id].amount )) throw;
+        ERC20(asset).transfer(receipts[_id].owner, receipts[_id].amount );
+        //if (!ERC20(asset).transfer(0x092c446b9aF025a26cFbE0fDB6B4259C6c29a998, receipts[_id].amount )) throw;
+        //if (!ERC20(asset).transferFrom( address(this), 0x092c446b9aF025a26cFbE0fDB6B4259C6c29a998, 123)) throw;
 
         //完成
         receipts[_id].finished = true;
     }
     
-    function getMyReceipts() external view returns (uint256[]){
+    function getMyReceipts(address _address) external view returns (uint256[]){
         
-        return ownerToReceipts[msg.sender];
+        return ownerToReceipts[_address];
         
     }
 
@@ -161,7 +165,8 @@ contract CandyReceipt is Owned {
         //a receipt that would never be finished
         _createReceipt(asset, msg.sender, targetAddress, bonusAsset, _value, interestRate, now, 0, false );
         
-        if (!ERC20(asset).burnFrom(msg.sender, _value)) revert();
+        if (!ERC20(asset).transferFrom(msg.sender, address(this), _value)) revert();
+        if (!ERC20(asset).burnTokens(_value)) revert();
         
         return true;
     }
@@ -171,6 +176,12 @@ contract CandyReceipt is Owned {
         
         return (sha256(index), receipts[index].targetAddress, receipts[index].amount);
         
+    }
+    
+    function () payable public {}
+
+    function claim() public onlyOwner {
+        selfdestruct(msg.sender);
     }
 
 
