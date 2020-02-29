@@ -1,4 +1,3 @@
-microsoft...
 pragma solidity ^0.4.24;
 pragma experimental ABIEncoderV2;
 
@@ -47,7 +46,7 @@ contract MerkleTreeGenerator is Owned {
     using SafeMath for uint256;
     event Log(bytes data);
 
-    CandyReceipt candyReceipt = CandyReceipt(0x3e7a349468F39253D0c35e8F81b1EDfb6B5aFDF8);
+    CandyReceipt candyReceipt = CandyReceipt(0x84Edc981604eb3Ae248bDAB9c54ce9B07272C8e4);
     uint256 public currentIndex = 0;
     bytes32[] public leafNodes;         //always empty
     MerkleTree[] public merkleTrees;
@@ -141,7 +140,7 @@ contract MerkleTreeGenerator is Owned {
         uint256 leafCount = leafNodes.length;
         bytes32 left;
         bytes32 right;
-        uint256 nodeToAdd = leafNodes.length / 2;
+        
         uint256 newAdded = 0;
         uint256 i = 0;
         
@@ -150,6 +149,8 @@ contract MerkleTreeGenerator is Owned {
         if(leafNodes.length % 2 == 1) {
             leafNodes.push(leafNodes[leafNodes.length - 1]);
         }
+        
+        uint256 nodeToAdd = leafNodes.length / 2;
         
         //generate branch nodes
         while( i < leafNodes.length - 1) {
