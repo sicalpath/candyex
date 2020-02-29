@@ -26,8 +26,8 @@ contract Owned {
 contract ERC20 {
   uint256 public totalSupply;
   function balanceOf(address who) public view returns (uint256);
-  //function transfer(address to, uint256 value) public returns (bool); //real elf
-  function transfer(address _to, uint256 _value) public;
+  function transfer(address to, uint256 value) public returns (bool); //real elf
+  //function transfer(address _to, uint256 _value) public;
   function allowance(address owner, address spender) public view returns (uint256);
   function transferFrom(address from, address to, uint256 value) public returns (bool);
   function approve(address spender, uint256 value) public returns (bool);
@@ -42,9 +42,9 @@ contract CandyReceipt is Owned {
     using SafeMath for uint256;
     event NewReceipt(uint256 receiptId, address asset, uint256 endTime);
 
-    address public asset = 0x26eC050Cb578451A338b61F3645BCA2585845ffd;
+    address public asset = 0x730785d79D7f8E31BF0173E8396d92B42f019062;
     address public bonusAsset = 0xbf2179859fc6d5bee9bf9158632dc51678a4100e;
-    uint256 public saveTime = 86400 * 30; //1 days;
+    uint256 public saveTime = 10; //1 days;
     uint256 public interestRate = 100; // rate of asset to bonus per day/hour/minute
     uint256 public receiptCount = 0;
 

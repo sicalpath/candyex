@@ -46,7 +46,7 @@ contract MerkleTreeGenerator is Owned {
     using SafeMath for uint256;
     event Log(bytes data);
 
-    CandyReceipt candyReceipt = CandyReceipt(0x45b4f34f439848303CbE73dcb197e8658eeeE7a8);
+    CandyReceipt candyReceipt = CandyReceipt(0x7DA7e5dE3d3C85Edd0E6afcf2b6F4afb652290C8);
     uint256 public currentIndex = 0;
     bytes32[] public leafNodes;         //always empty
     MerkleTree[] public merkleTrees;
