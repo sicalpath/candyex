@@ -123,6 +123,10 @@ contract MerkleTreeGenerator is Owned {
                 leafNodes.push(sha256(sha256(amount), sha256(targetAddress),sha256(currentIndex + i)));
                 Log(abi.encodePacked(sha256(amount), sha256(targetAddress), sha256(currentIndex + i)));
             }
+            else {
+                leafNodes.push(sha256(sha256(0), sha256(0),sha256(currentIndex + i)));
+                Log(abi.encodePacked(sha256(0), sha256(0), sha256(currentIndex + i)));
+            }
             
         }
         
