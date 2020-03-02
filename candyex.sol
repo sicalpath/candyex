@@ -151,6 +151,24 @@ contract CandyReceipt is Owned {
         return ownerToReceipts[_address];
         
     }
+    function getLockTokens(address _address) external view returns (uint256){
+        
+
+        
+        uint256[] memory myReceipts = ownerToReceipts[_address!=address(0) ? _address:msg.sender];
+        uint256 amount = 0;
+        
+        
+        for(uint256 i=0; i< myReceipts.length; i++) {
+            if(receipts[myReceipts[i]].finished == false){
+                amount += receipts[myReceipts[i]].amount;
+            }
+            
+        }
+        
+        
+        return amount;
+    }
 
     function fixSaveTime(uint256 _period) external onlyOwner {
         saveTime = _period;
