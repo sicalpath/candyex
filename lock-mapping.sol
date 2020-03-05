@@ -40,92 +40,92 @@ contract ERC20 {
 contract LockMapping is Owned {
     
     using SafeMath for uint256;
-	event NewReceipt(uint256 receiptId, address asset, uint256 endTime);
+    event NewReceipt(uint256 receiptId, address asset, uint256 endTime);
 
-	address public asset = 0x730785d79D7f8E31BF0173E8396d92B42f019062;
-	uint256 public saveTime = 86400*30; //1 days;
+    address public asset = 0x730785d79D7f8E31BF0173E8396d92B42f019062;
+    uint256 public saveTime = 86400*30; //1 days;
     uint256 public receiptCount = 0;
 
 
-	struct Receipt {
+    struct Receipt {
 
-		address asset;		//token to deposit  ELF:0xbf2179859fc6d5bee9bf9158632dc51678a4100e
-	    address owner;		//owner of this receipt
-	    string targetAddress;
-	    uint256 amount;
-	    uint256 startTime;      
-	    uint256 endTime;
-	    bool finished; 
+        address asset;      //token to deposit  ELF:0xbf2179859fc6d5bee9bf9158632dc51678a4100e
+        address owner;      //owner of this receipt
+        string targetAddress;
+        uint256 amount;
+        uint256 startTime;      
+        uint256 endTime;
+        bool finished; 
 
-  	}
-
-
-  	Receipt[] public receipts;
-
-  	mapping (uint256 => address) public receiptToOwner;
-  	mapping (address => uint256[]) public ownerToReceipts;
+    }
 
 
-  	//检查某token是否授权了足够的额度
-  	modifier haveAllowance(address _asset, uint256 _amount) {
+    Receipt[] public receipts;
 
-  		uint256 allowance = ERC20(asset).allowance(msg.sender, address(this));
-	    require(allowance >= _amount);
-	    _;
-	}
-
-	//检查存单是否到期
-	modifier exceedEndtime(uint256 _id) {
-
-	    require(receipts[_id].endTime != 0 && receipts[_id].endTime <= now);
-	    _;
-	}
-
-	//检查存单是否已经完成
-	modifier notFinished(uint256 _id) {
-
-	    require(receipts[_id].finished == false);
-	    _;
-	}
+    mapping (uint256 => address) public receiptToOwner;
+    mapping (address => uint256[]) public ownerToReceipts;
 
 
-  	function _createReceipt(
-  		address _asset, 
-  		address _owner, 
-  		string _targetAddress,
-  		uint256 _amount, 
-  		uint256 _startTime, 
-  		uint256 _endTime,
-  		bool _finished
-  		) internal {
+    //检查某token是否授权了足够的额度
+    modifier haveAllowance(address _asset, uint256 _amount) {
 
-	    uint256 id = receipts.push(Receipt(_asset, _owner, _targetAddress, _amount, _startTime, _endTime, _finished)) - 1;
+        uint256 allowance = ERC20(asset).allowance(msg.sender, address(this));
+        require(allowance >= _amount);
+        _;
+    }
+
+    //检查存单是否到期
+    modifier exceedEndtime(uint256 _id) {
+
+        require(receipts[_id].endTime != 0 && receipts[_id].endTime <= now);
+        _;
+    }
+
+    //检查存单是否已经完成
+    modifier notFinished(uint256 _id) {
+
+        require(receipts[_id].finished == false);
+        _;
+    }
+
+
+    function _createReceipt(
+        address _asset, 
+        address _owner, 
+        string _targetAddress,
+        uint256 _amount, 
+        uint256 _startTime, 
+        uint256 _endTime,
+        bool _finished
+        ) internal {
+
+        uint256 id = receipts.push(Receipt(_asset, _owner, _targetAddress, _amount, _startTime, _endTime, _finished)) - 1;
         
         receiptCount = id + 1;
-	    receiptToOwner[id] = msg.sender;
-	    ownerToReceipts[msg.sender].push(id);
-	    NewReceipt(id, _asset, _endTime);
-	}
+        receiptToOwner[id] = msg.sender;
+        ownerToReceipts[msg.sender].push(id);
+        NewReceipt(id, _asset, _endTime);
+    }
 
 
-	//create new receipt
-	function createReceipt(uint256 _amount, string targetAddress) external haveAllowance(asset,_amount) {
+    //create new receipt
+    function createReceipt(uint256 _amount, string targetAddress) external haveAllowance(asset,_amount) {
   
-		//other processes
+        //other processes
 
-		//deposit token to this contract
-		if (!ERC20(asset).transferFrom(msg.sender, address(this), _amount)) throw;
+        //deposit token to this contract
+        if (!ERC20(asset).transferFrom(msg.sender, address(this), _amount)) revert();
 
-		//
-	    _createReceipt(asset, msg.sender, targetAddress, _amount, now, now + saveTime, false );
-  	}
+        //
+        _createReceipt(asset, msg.sender, targetAddress, _amount, now, now + saveTime, false );
+    }
 
-  	//finish the receipt and withdraw bonus and token
-  	function finishReceipt(uint256 _id) external notFinished(_id) exceedEndtime(_id) {
+    //finish the receipt and withdraw bonus and token
+    function finishReceipt(uint256 _id) external notFinished(_id) exceedEndtime(_id) {
   
-        ERC20(asset).transfer(receipts[_id].owner, receipts[_id].amount );
-	    receipts[_id].finished = true;
-  	}
+        if(!ERC20(asset).transfer(receipts[_id].owner, receipts[_id].amount )) revert();
+        receipts[_id].finished = true;
+    }
     
     function getMyReceipts(address _address) external view returns (uint256[]){
         
@@ -151,15 +151,15 @@ contract LockMapping is Owned {
         return amount;
     }
 
-  	function fixSaveTime(uint256 _period) external onlyOwner {
-  		saveTime = _period;
-  	}
-  	
-  	function fixAssetAddress(address _address) external onlyOwner {
-  		asset = _address;
-  	}
-  	
-  	function burn(string targetAddress, uint256 _value) public haveAllowance(asset,_value) returns (bool success) {
+    function fixSaveTime(uint256 _period) external onlyOwner {
+        saveTime = _period;
+    }
+    
+    function fixAssetAddress(address _address) external onlyOwner {
+        asset = _address;
+    }
+    
+    function burn(string targetAddress, uint256 _value) public haveAllowance(asset,_value) returns (bool success) {
         
         //a receipt that would never be finished
         _createReceipt(asset, msg.sender, targetAddress, _value, now, 0, false );
